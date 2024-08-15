@@ -1,0 +1,203 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Text;
+using TMPro;
+using UnityEngine;
+
+public class ESP32BLEApp : MonoBehaviour
+{
+    private string DeviceName = "ESP32_mpu";
+    private string ServiceUUID = "0000FFE0-0000-1000-8000-00805F9B34FB";
+    private string CharacteristicUUID = "0000FFE1-0000-1000-8000-00805F9B34FB";
+
+    enum States
+    {
+        None,
+        Scan,
+        Connect,
+        RequestMTU,
+        Subscribe,
+        Unsubscribe,
+        Disconnect,
+        Communication,
+    }
+
+    private bool _workingFoundDevice = false;
+    private bool _connected = false;
+    private float _timeout = 0f;
+    private States _state = States.None;
+    private string _deviceAddress;
+
+    [SerializeField] private TMP_Text stateText;
+    // [SerializeField] private TMP_Text angleText;  // Add a reference to the TMP_Text for angleX
+    [SerializeField] private Transform cube;
+    private Quaternion inverseQt;
+    private Quaternion rawQt;
+
+    void Reset()
+    {
+        _workingFoundDevice = false;
+        _connected = false;
+        _timeout = 0f;
+        _state = States.None;
+        _deviceAddress = null;
+    }
+
+    void SetState(States newState, float timeout)
+    {
+        _state = newState;
+        _timeout = timeout;
+    }
+
+    void setStateText(string text)
+    {
+        if (stateText == null) return;
+        stateText.text = text;
+    }
+
+    //void setAngleText(string text)  // Add a method to update the angleText
+    //{
+      //  if (angleText == null) return;
+      //  angleText.text = text;
+   // }
+
+    void StartProcess()
+    {
+        setStateText("Initializing...");
+
+        Reset();
+        BluetoothLEHardwareInterface.Initialize(true, false, () => {
+            SetState(States.Scan, 0.1f);
+            setStateText("Initialized");
+        }, (error) => {
+            BluetoothLEHardwareInterface.Log("Error: " + error);
+        });
+    }
+
+    void Start()
+    {
+        StartProcess();
+        inverseQt = Quaternion.identity;
+    }
+
+    void Update()
+    {
+        if (_timeout > 0f)
+        {
+            _timeout -= Time.deltaTime;
+            if (_timeout <= 0f)
+            {
+                _timeout = 0f;
+
+                switch (_state)
+                {
+                    case States.None:
+                        break;
+
+                    case States.Scan:
+                        setStateText("Scanning for ESP32 devices...");
+
+                        BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(null, (address, name) => {
+                            if (name.Contains(DeviceName))
+                            {
+                                _workingFoundDevice = true;
+                                BluetoothLEHardwareInterface.StopScan();
+
+                                _deviceAddress = address;
+                                SetState(States.Connect, 0.5f);
+                                _workingFoundDevice = false;
+                            }
+
+                        }, null, false, false);
+                        break;
+
+                    case States.Connect:
+                        setStateText("Connecting to ESP32");
+
+                        BluetoothLEHardwareInterface.ConnectToPeripheral(_deviceAddress, null, null, (address, serviceUUID, characteristicUUID) => {
+                            if (IsEqual(serviceUUID, ServiceUUID) && IsEqual(characteristicUUID, CharacteristicUUID))
+                            {
+                                _connected = true;
+                                SetState(States.RequestMTU, 2f);
+                                setStateText("Connected to ESP32");
+
+                                // Example: Subscribe to characteristic for receiving data
+                                SetState(States.Subscribe, 0.1f);  // Adjust timeout as needed
+                            }
+                        }, (disconnectedAddress) => {
+                            BluetoothLEHardwareInterface.Log("Device disconnected: " + disconnectedAddress);
+                            setStateText("Disconnected");
+                        });
+                        break;
+
+                    case States.Subscribe:
+                        setStateText("Subscribing to ESP32");
+
+                        BluetoothLEHardwareInterface.SubscribeCharacteristicWithDeviceAddress(_deviceAddress, ServiceUUID, CharacteristicUUID, null, (address, characteristicUUID, bytes) => {
+                          
+                            float qx = BitConverter.ToSingle(bytes, 0);
+                            float qy = BitConverter.ToSingle(bytes, 4);
+                            float qz = BitConverter.ToSingle(bytes, 8);
+                            float qw = BitConverter.ToSingle(bytes, 12);
+
+                            setStateText("byte length: " + bytes.Length + ", qx: " + qx.ToString("0.00000") +
+                                ", qy: " + qy.ToString("0.00000") + ", qz: " + qz.ToString("0.00000") +
+                                ", qw: " + qw.ToString("0.00000"));
+
+                            rawQt = new Quaternion(0, qx, 0, qw);
+                            cube.rotation = rawQt * inverseQt ;
+                           // setAngleText("AngleX: " + converted);  // Update the angleText with the received value
+                        });
+
+                        _state = States.None;
+                        break;
+
+
+                    case States.Unsubscribe:
+                        BluetoothLEHardwareInterface.UnSubscribeCharacteristic(_deviceAddress, ServiceUUID, CharacteristicUUID, null);
+                        SetState(States.Disconnect, 4f);
+                        break;
+
+                    case States.Disconnect:
+                        if (_connected)
+                        {
+                            BluetoothLEHardwareInterface.DisconnectPeripheral(_deviceAddress, (address) => {
+                                BluetoothLEHardwareInterface.DeInitialize(() => {
+                                    _connected = false;
+                                    _state = States.None;
+                                });
+                            });
+                        }
+                        else
+                        {
+                            BluetoothLEHardwareInterface.DeInitialize(() => {
+                                _state = States.None;
+                            });
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    string FullUUID(string uuid)
+    {
+        return "0000" + uuid + "-0000-1000-8000-00805F9B34FB";
+    }
+
+    bool IsEqual(string uuid1, string uuid2)
+    {
+        if (uuid1.Length == 4)
+            uuid1 = FullUUID(uuid1);
+        if (uuid2.Length == 4)
+            uuid2 = FullUUID(uuid2);
+
+        return (uuid1.ToUpper().Equals(uuid2.ToUpper()));
+    }
+
+    public void resetRotation()
+    {
+        inverseQt = Quaternion.Inverse(rawQt);
+    }
+}

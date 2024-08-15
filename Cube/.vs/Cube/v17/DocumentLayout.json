@@ -1,0 +1,70 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\assets\\scripts\\firstgamescripts\\playermovementble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\firstgamescripts\\playermovementble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\assets\\scripts\\common\\esp32bleapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\common\\esp32bleapp.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\assets\\scripts\\secondgamescripts\\playermovementsecondble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A43657F2-DFD0-F1AD-69C5-B86E0C471339}|Assembly-CSharp.csproj|solutionrelative:assets\\scripts\\secondgamescripts\\playermovementsecondble.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "PlayerMovementBLE.cs",
+              "DocumentMoniker": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\FirstGameScripts\\PlayerMovementBLE.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\FirstGameScripts\\PlayerMovementBLE.cs",
+              "ToolTip": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\FirstGameScripts\\PlayerMovementBLE.cs",
+              "RelativeToolTip": "Assets\\Scripts\\FirstGameScripts\\PlayerMovementBLE.cs",
+              "ViewState": "AQIAACIAAAAAAAAAAAAQwC4AAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-02T16:25:08.022Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "PlayerMovementSecondBLE.cs",
+              "DocumentMoniker": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\SecondGameScripts\\PlayerMovementSecondBLE.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\SecondGameScripts\\PlayerMovementSecondBLE.cs",
+              "ToolTip": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\SecondGameScripts\\PlayerMovementSecondBLE.cs",
+              "RelativeToolTip": "Assets\\Scripts\\SecondGameScripts\\PlayerMovementSecondBLE.cs",
+              "ViewState": "AQIAAC0AAAAAAAAAAAAYwD8AAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-02T15:26:06.257Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "ESP32BLEApp.cs",
+              "DocumentMoniker": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\Common\\ESP32BLEApp.cs",
+              "RelativeDocumentMoniker": "Assets\\Scripts\\Common\\ESP32BLEApp.cs",
+              "ToolTip": "C:\\Users\\hmayi\\OneDrive\\Bureau\\unityProjects\\Cube\\Assets\\Scripts\\Common\\ESP32BLEApp.cs",
+              "RelativeToolTip": "Assets\\Scripts\\Common\\ESP32BLEApp.cs",
+              "ViewState": "AQIAAFMAAAAAAAAAAAAswAsAAAAEAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-08-02T14:51:07.046Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

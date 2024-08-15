@@ -1,0 +1,78 @@
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class ObstacleSpawner : MonoBehaviour
+{
+    [SerializeField] float minXPOS,maxXPOS;
+
+    [Space]
+    [SerializeField] float minZOffset, maxZOffset;
+
+    [Space]
+    [SerializeField] float minObstacleXScale, maxXObstacleXScale;
+
+
+    [Space]
+    [SerializeField] GameObject obstaclePrefab;
+
+    [Space]
+    [SerializeField] int minNumOfObstacles,maxNumOfObstacles;
+
+    [Space]
+    [SerializeField] Vector3 startingPosition;
+
+    //Transform end line
+
+
+    private Vector3 currentSpawnPosition;
+
+    private void Awake()
+    {
+        currentSpawnPosition = startingPosition;
+
+        GenerateObstacles();
+    }
+
+    public void GenerateObstacles()
+    {
+        int numberOfObjects = Random.Range(minNumOfObstacles, maxNumOfObstacles);
+
+        for (int i = 0; i < numberOfObjects; i++)
+        {
+            //float xPos = Random.Range(minXPOS,maxXPOS);
+            float xPos = 0f;
+
+            int randomSide = Random.Range(0, 3);
+
+            //TODO: if same as previous x position change it && Obstacle Scale // End Line Should be Dynamic
+            switch (randomSide)
+            {
+                case 0:
+                    xPos = -5.5f;
+                    break;
+                case 1:
+                    xPos = 0f;
+                    break;
+                case 2:
+                    xPos = 5.5f;
+                    break;
+            }
+
+
+            currentSpawnPosition.x = xPos;
+
+            var obstacleClone = Instantiate(obstaclePrefab,currentSpawnPosition,Quaternion.identity);
+            
+            var zOffset = Random.Range(minZOffset,maxZOffset);
+
+            currentSpawnPosition.z += zOffset;
+
+        }
+
+        //End line position set here
+    }
+}
+
+

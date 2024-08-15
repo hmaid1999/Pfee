@@ -1,0 +1,177 @@
+using System;
+using System.Text;
+using DG.Tweening;
+using TMPro;
+using UnityEngine;
+
+public class ESP32BLEApp : MonoBehaviour
+{
+    private string DeviceName = "ESP32_mpu";
+    private string ServiceUUID = "0000FFE0-0000-1000-8000-00805F9B34FB";
+    private string CharacteristicUUID = "0000FFE1-0000-1000-8000-00805F9B34FB";
+
+    private bool _workingFoundDevice = false;
+    private bool _connected = false;
+    private float _timeout = 0f;
+    private string _deviceAddress;
+
+    [SerializeField] private TMP_Text stateText;
+    [SerializeField] private TMP_Text angleText;
+    [SerializeField] protected TMP_Text cubeText;
+    [SerializeField] protected TMP_Text anglesToParseText;
+    [SerializeField] private Transform cube;
+
+    private Quaternion initialRotation;
+
+    void Reset()
+    {
+        _workingFoundDevice = false;
+        _connected = false;
+        _timeout = 0f;
+        _deviceAddress = null;
+    }
+
+    void SetStateText(string text)
+    {
+        if (stateText == null) return;
+        stateText.text = text;
+    }
+
+    void SetAngleText(string text)
+    {
+        if (angleText == null) return;
+        angleText.text = text;
+    }
+
+    void StartProcess()
+    {
+        SetStateText("Initializing...");
+
+        Reset();
+        BluetoothLEHardwareInterface.Initialize(true, false, () => {
+            StartScan();
+            SetStateText("Initialized");
+        }, (error) => {
+            BluetoothLEHardwareInterface.Log("Error: " + error);
+        });
+    }
+
+    void StartScan()
+    {
+        SetStateText("Scanning for ESP32 devices...");
+
+        BluetoothLEHardwareInterface.ScanForPeripheralsWithServices(null, (address, name) => {
+            if (name.Contains(DeviceName))
+            {
+                _workingFoundDevice = true;
+                BluetoothLEHardwareInterface.StopScan();
+
+                _deviceAddress = address;
+                ConnectToDevice();
+                _workingFoundDevice = false;
+            }
+        }, null, false, false);
+    }
+
+    void ConnectToDevice()
+    {
+        SetStateText("Connecting to ESP32");
+
+        BluetoothLEHardwareInterface.ConnectToPeripheral(_deviceAddress, null, null, (address, serviceUUID, characteristicUUID) => {
+            if (IsEqual(serviceUUID, ServiceUUID) && IsEqual(characteristicUUID, CharacteristicUUID))
+            {
+                _connected = true;
+                SetStateText("Connected to ESP32");
+                SubscribeToCharacteristic();
+            }
+        }, (disconnectedAddress) => {
+            BluetoothLEHardwareInterface.Log("Device disconnected: " + disconnectedAddress);
+            SetStateText("Disconnected");
+            _connected = false;
+        });
+    }
+
+    void SubscribeToCharacteristic()
+    {
+        SetStateText("Subscribing to ESP32");
+
+        BluetoothLEHardwareInterface.SubscribeCharacteristicWithDeviceAddress(_deviceAddress, ServiceUUID, CharacteristicUUID, null, (address, characteristicUUID, bytes) => {
+            string receivedData = Encoding.UTF8.GetString(bytes);
+
+            SetAngleText(receivedData);
+
+            string[] angleValues = receivedData.Split(',');
+            //float angleX = float.Parse();
+            //float angleY = float.Parse(angleValues[1].Split(':')[1]);
+            //float angleZ = float.Parse(angleValues[2].Split(':')[1]);
+
+            anglesToParseText.text = $"X= {angleValues[0]} Y= {angleValues[1]} Z= {angleValues[2]}  Table Length= {angleValues.Length}";
+
+
+            bool isFloatX = float.TryParse(angleValues[0], out float angleX);
+            bool isFloatY = float.TryParse(angleValues[1], out float angleY);
+            bool isFloatZ = float.TryParse(angleValues[2], out float angleZ);
+
+
+            //X:179, Y:54, Z:63
+            //angleValues [ X:179 , Y:54 , Z:63 ]
+            // => float.Parse (X:179) this is not a float X:179 
+
+
+            if (isFloatX)
+            {
+                cubeText.text = $"X= {angleX} Y= {angleY} Z= {angleZ} ";
+            }
+            else
+            {
+                cubeText.text = $"X= Failed To Parse Y= {angleY} Z= {angleZ} ";
+            }
+
+            
+
+            captureRotation = Quaternion.Euler(angleX, angleY, angleZ);
+
+            Vector3 cubeRotation = new Vector3(angleX,angleY,angleZ);
+
+            cube.DORotate(cubeRotation, 0.3f);
+
+        });
+    }
+
+    Quaternion captureRotation;
+
+    void Start()
+    {
+        StartProcess();
+        initialRotation = cube.rotation; // Store the initial rotation of the cube
+    }
+
+    void Update()
+    {
+        // You can add any periodic tasks here if needed.
+
+        //cube.rotation = captureRotation;
+
+        
+    }
+
+    string FullUUID(string uuid)
+    {
+        return "0000" + uuid + "-0000-1000-8000-00805F9B34FB";
+    }
+
+    bool IsEqual(string uuid1, string uuid2)
+    {
+        if (uuid1.Length == 4)
+            uuid1 = FullUUID(uuid1);
+        if (uuid2.Length == 4)
+            uuid2 = FullUUID(uuid2);
+
+        return (uuid1.ToUpper().Equals(uuid2.ToUpper()));
+    }
+
+    public void ResetRotation()
+    {
+        cube.rotation = initialRotation; // Reset the cube to its initial rotation
+    }
+}
