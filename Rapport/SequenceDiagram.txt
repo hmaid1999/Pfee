@@ -1,0 +1,37 @@
+@startuml
+participant Patient
+participant InterfaceAndroid
+participant Balance
+participant Jeu1
+participant Jeu2
+
+Patient -> InterfaceAndroid: Démarrer l'application
+InterfaceAndroid -> Patient: Afficher l'interface de choix de jeu
+Patient -> InterfaceAndroid: Choisir un jeu (Jeu 1 ou Jeu 2)
+
+alt Jeu 1
+    InterfaceAndroid -> Balance: Démarrer le Jeu 1
+    Balance -> Jeu1: Initier le jeu
+    loop Interaction du patient
+        Patient -> Balance: Appuyer pied droit (aller à droite)
+        Balance -> Jeu1: Déplacement du personnage/objet à droite
+        Patient -> Balance: Appuyer pied gauche (aller à gauche)
+        Balance -> Jeu1: Déplacement du personnage/objet à gauche
+        Patient -> Balance: Appuyer les deux pieds (freiner)
+        Balance -> Jeu1: Freinage du personnage/objet
+    end loop
+else Jeu 2
+    InterfaceAndroid -> Balance: Démarrer le Jeu 2
+    Balance -> Jeu2: Initier le jeu
+    loop Interaction du patient
+        Patient -> Balance: Appuyer avant droite
+        Balance -> Jeu2: Déplacement de la boule vers avant droite
+        Patient -> Balance: Appuyer avant gauche
+        Balance -> Jeu2: Déplacement de la boule vers avant gauche
+        Patient -> Balance: Appuyer arrière droite
+        Balance -> Jeu2: Déplacement de la boule vers arrière droite
+        Patient -> Balance: Appuyer arrière gauche
+        Balance -> Jeu2: Déplacement de la boule vers arrière gauche
+    end loop
+end alt
+@enduml
